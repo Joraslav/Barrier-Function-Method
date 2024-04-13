@@ -6,9 +6,13 @@
 
 using namespace std;
 using type = long double;
+template <class T>
+using vector_tmpl = vector<T>;
+
+using vector_type = vector_tmpl<type>;
 
 template <class T>
-vector<type> operator+(vector<T> const& l, vector<T> const& r)
+vector_tmpl<T> operator+(vector_tmpl<T> const& l, vector_tmpl<T> const& r)
 {
   if (l.size() != r.size()){throw std::invalid_argument("wrong sizes");}  //Проверка размерности
 
@@ -24,7 +28,7 @@ vector<type> operator+(vector<T> const& l, vector<T> const& r)
 }
 
 template <class T>
-vector<type> operator-(vector<T> const& l, vector<T> const& r)
+vector_tmpl<T> operator-(vector_tmpl<T> const& l, vector_tmpl<T> const& r)
 {
   if (l.size() != r.size()){throw std::invalid_argument("wrong sizes");}  //Проверка размерности
 
@@ -40,7 +44,7 @@ vector<type> operator-(vector<T> const& l, vector<T> const& r)
 }
 
 template<class T>
-type operator*(vector<T> const& l, vector<T> const& r)
+type operator*(vector_tmpl<T> const& l, vector_tmpl<T> const& r)
 {
   if (l.size() != r.size()){throw std::invalid_argument("wrong sizes");}  //Проверка размерности
 
@@ -56,7 +60,19 @@ type operator*(vector<T> const& l, vector<T> const& r)
 }
 
 template<class T>
-ostream& operator<<(ostream& out, vector<T> const& v)
+vector_tmpl<T> operator*(type const& c, vector_tmpl<T> const& r)
+{
+  vector_tmpl<T> Rez{r};
+  auto const nRows{Rez.size()};
+  for (auto i{0u}; i < nRows; ++i)
+  {
+    Rez[i] = c*Rez[i];
+  }
+  return Rez;
+}
+
+template<class T>
+ostream& operator<<(ostream& out, vector_tmpl<T> const& v)
 {
   for (auto const &i : v)
   {
@@ -65,7 +81,7 @@ ostream& operator<<(ostream& out, vector<T> const& v)
   return out;
 }
 
-type Norm(vector<type> const& v)
+type Norm(vector_type const& v)
 {
   auto Rez = 0.0;
   auto ScalarProd = v*v;
@@ -75,14 +91,14 @@ type Norm(vector<type> const& v)
   return Rez;
 }
 
-type f(vector<type> const& x)
+type f(vector_type const& x)
 {
   return pow(x[0]-2,4)+pow(x[0]-2*x[1],2);
 }
 
-vector<type> Grad(vector<type> const& x)
+vector_type Grad(vector_type const& x)
 {
-  vector<type> Rez;
+  vector_type Rez;
   Rez.push_back(4.*pow(x[0]-2,3)+2.*(x[0]-2.*x[1]));
   Rez.push_back(-4.*(x[0]-2.*x[1]));
   return Rez;
