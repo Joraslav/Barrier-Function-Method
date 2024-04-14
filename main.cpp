@@ -159,7 +159,8 @@ vector_type Steepest_Descent(vector_type x_0, type const& eps)
   type lyam = Find_Lyam(x_0,r);
   vector_type x_next = x_0 - lyam*Grad(x_0,r);
   unsigned short int iter{1};
-  while (Norm(Grad_P(x_next,r)) > eps)
+
+  while (BF(x_next,r) > eps)
   {
     cout << "Iteration\t" << iter << endl;
     cout << "Grad\t" << Grad(x_0,r) << endl;
@@ -171,6 +172,19 @@ vector_type Steepest_Descent(vector_type x_0, type const& eps)
     r /= c;
     iter++;
   }
+
+  // while (Norm(Grad_P(x_next,r)) > eps)
+  // {
+  //   cout << "Iteration\t" << iter << endl;
+  //   cout << "Grad\t" << Grad(x_0,r) << endl;
+  //   x_0.clear();
+  //   x_0 = x_next;
+  //   x_next.clear();
+  //   lyam = Find_Lyam(x_0,r);
+  //   x_next = x_0 - lyam*Grad(x_0,r);
+  //   r /= c;
+  //   iter++;
+  // }
   return x_next;
 }
 
