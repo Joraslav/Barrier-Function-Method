@@ -96,68 +96,48 @@ type f(vector_type const& x)
   return pow(x[0]-2,4)+pow(x[0]-2*x[1],2);
 }
 
-vector_type Grad(vector_type const& x)
+type g1(vector_type const& x)
 {
-  vector_type Rez;
-  Rez.push_back(4.*pow(x[0]-2,3)+2.*(x[0]-2.*x[1]));
-  Rez.push_back(-4.*(x[0]-2.*x[1]));
+  return 1.-2*x[0]-x[1];
+}
+
+type g2(vector_type const& x)
+{
+  return 1.-2*x[0]-pow(x[1],3);
+}
+
+type P(vector_type const& x, type const& r)
+{
+  return -r/(g1(x)+g2(x));
+}
+
+type BF(vector_type const& x, type const& r)
+{
+  return f(x) + P(x,r);
+}
+
+template <class T>
+vector_tmpl<T> Grad_P(vector_tmpl<T> const& x, type const& r)
+{
+  vector_tmpl<T> Rez;
+  Rez.push_back(-r*(2./pow(g1(x),2)+2./pow(g2(x),2)));
+  Rez.push_back(-r*(1./pow(g1(x),2)+(3*pow(x[1],2))/pow(g2(x),2)));
   return Rez;
 }
 
-vector<type> X_Next(type const& lyam, vector<type> const& x, function<vector<type>(vector<type> const&)> func)
+template <class T>
+vector_tmpl<T> Grad(vector_tmpl<T> const& x, type const& r)
 {
-  vector<type> Rez;
-  for (auto i{0u}; i < x.size(); ++i)
-  {
-    Rez.push_back(x[i]-lyam*func(x)[i]);
-  }
+  vector_tmpl<T> Rez;
+  Rez.push_back(4.*pow(x[0]-2,3)+2.*(x[0]-2.*x[1])+Grad_P(x,r)[0]);
+  Rez.push_back(-4.*(x[0]-2.*x[1])+Grad_P(x,r)[1]);
   return Rez;
-}
-
-type df_lyam(vector<type> const& x, type const& lyam, function<vector<type>(vector<type> const&)> func_grad)
-{
-  auto x_next = X_Next(lyam,x,func_grad);
-  return 4*pow(x_next[0]-2,3)*func_grad(x)[0]+2*(x_next[0]-2*x_next[1])*(func_grad(x)[1]-2*func_grad(x)[1]);
-  // return 4*pow(func_x(lyam,x)[0]-2,3)*func_grad(x)[0]+2*(func_x(lyam,x)[0]-2*func_x(lyam,x)[1])*(func_grad(x)[1]-2*func_grad(x)[1]);
-}
-
-type FindLyam(vector<type> const& x, type const& eps)
-{
-  type a=0, b=1, c;
-  while (abs(a-b)/2 > eps)
-  {
-    c = (a+b)/2;
-    if (df_lyam(x,a,&Grad) * df_lyam(x,c,&Grad) <= 0)   {b = c;}
-    else        {a = c;}
-  }
-  return c;  
-}
-
-vector<type> X_Solve(vector<type> &x, type const& eps)
-{
-  type lyam = FindLyam(x,eps);
-  vector<type> x_next = X_Next(lyam,x,&Grad);
-  unsigned short int iter = 1;
-  while (Norm(Grad(x_next)) > eps)
-  {
-    cout << "Iteration\t" << iter << endl;
-    x.clear();
-    x = x_next;
-    x_next.clear();
-    lyam = FindLyam(x,eps);
-    x_next = X_Next(lyam,x,&Grad);
-    iter++;
-  }
-  return x_next;
 }
 
 int main()
 {
-  vector<type> x_0{5,5};
-  type eps = 0.001;
-
-  vector<type> x = X_Solve(x_0,eps);
-  cout << "Ans is\t" << x << endl;
+  type r = 100;
+  type c = 10;
 
   return 0;
 }
