@@ -108,7 +108,7 @@ type g2(vector_type const& x)
 
 type P(vector_type const& x, type const& r)
 {
-  return -r/(g1(x)+g2(x));
+  return -r*((1/g1(x))+1/g2(x));
 }
 
 type BF(vector_type const& x, type const& r)
@@ -132,6 +132,26 @@ vector_tmpl<T> Grad(vector_tmpl<T> const& x, type const& r)
   Rez.push_back(4.*pow(x[0]-2,3)+2.*(x[0]-2.*x[1])+Grad_P(x,r)[0]);
   Rez.push_back(-4.*(x[0]-2.*x[1])+Grad_P(x,r)[1]);
   return Rez;
+}
+
+type dBF_lyam(vector_type const& x, type const& r, type const& c)
+{
+  vector_type x_nest = x - c*Grad(x,r);
+  return 4.*pow(x[0]-2,3)*Grad(x,r)[0]
+        +2.*(x[0]-2.*x[1])*(Grad(x,r)[0]-2*Grad(x,r)[1])
+        +r*((-2*Grad(x,r)[0]-Grad(x,r)[1])/pow(g1(x_nest),2)+(-2*Grad(x,r)[0]-3*Grad(x,r)[1]*x_nest[1])/pow(g2(x_nest),2));
+}
+
+type Find_Lyam(vector_type const& x, type const& r)
+{
+  type a=0,b=1,c;
+  while (abs(a-b)/2 > 0.001)
+  {
+    c = (a+b)/2;
+    if (dBF_lyam(x,r,a)*dBF_lyam(x,r,c) <= 0)   {b = c;}
+    else    {a = c;}
+  }
+  return c;
 }
 
 int main()
