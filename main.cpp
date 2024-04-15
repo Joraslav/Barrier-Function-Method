@@ -137,7 +137,9 @@ vector_tmpl<T> Grad(vector_tmpl<T> const& x, type const& r)
 type dBF_lyam(vector_type const& x, type const& r, type const& c)
 {
   vector_type x_nest = x - c*Grad(x,r);
-  return 4.*pow(x_nest[0]-2,3)*Grad(x,r)[0]+2.*(x_nest[0]-2.*x_nest[1])*(Grad(x,r)[0]-2*Grad(x,r)[1])+r*((-2*Grad(x,r)[0]-Grad(x,r)[1])/pow(g1(x_nest),2)+(-2*Grad(x,r)[0]-3*Grad(x,r)[1]*x_nest[1])/pow(g2(x_nest),2));
+  return 4.*pow(x_nest[0]-2,3)*Grad(x,r)[0]
+        +2.*(x_nest[0]-2.*x_nest[1])*(Grad(x,r)[0]-2*Grad(x,r)[1])
+        +r*((-2*Grad(x,r)[0]-Grad(x,r)[1])/pow(g1(x_nest),2)+(-2*Grad(x,r)[0]-3*Grad(x,r)[1]*x_nest[1])/pow(g2(x_nest),2));
 }
 
 type Find_Lyam(vector_type const& x, type const& r)
